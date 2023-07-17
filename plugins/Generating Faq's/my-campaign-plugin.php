@@ -104,17 +104,23 @@ function faq_generator_shortcode( $atts ) {
 
     $faqs = get_posts( $args );
 
-    ob_start();
-    ?>
-    <div class="faq-list">
-        <?php foreach ( $faqs as $faq ) : ?>
-            <div class="faq">
-                <h3><?php echo esc_html( get_post_meta( $faq->ID, 'faq_question', true ) ); ?></h3>
-                <div class="answer"><?php echo wp_kses_post( get_post_meta( $faq->ID, 'faq_answer', true ) ); ?></div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    <?php
-    return ob_get_clean();
+    if ( ! empty( $faqs ) ) {
+        ob_start();
+        ?>
+        <div class="faq-list">
+            <?php foreach ( $faqs as $faq ) : setup_postdata( $faq ); ?>
+                <div class="faq">
+                    <h3><?php echo esc_html( get_post_meta( $faq->ID, 'faq_question', true ) ); ?></h3>
+                    <div class="answer"><?php echo wp_kses_post( get_post_meta( $faq->ID, 'faq_answer', true ) ); ?></div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
+        wp_reset_postdata();
+        return ob_get_clean();
+    } else {
+        return '<p>No FAQs found.</p>';
+    }
 }
 add_shortcode( 'faq_generator', 'faq_generator_shortcode' );
+
